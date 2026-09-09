@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">BibleRiddles</string>
+    <string name="title_activity_configuration">ConfigurationActivity</string>
+    <string name="title_activity_main_menu">MainMenuActivity</string>
+    <string name="title_activity_stages_list">StagesList</string>
+    <string name="game_logo_description">Bible Riddles</string>
+    <string name="start_game">INICIAR</string>
+    <string name="continue_game">CONTINUAR</string>
+    <string name="stages_list">PROGRESSO</string>
+    <string name="back">Voltar</string>
+    <string name="stage_locked_description">Fase %1$d, bloqueada</string>
+    <string name="stage_current_description">Fase %1$d, atual</string>
+    <string name="stage_score_description">Fase %1$d, pontuação de %2$d de 3 estrelas</string>
+    <string name="stage_title">FASE %1$d</string>
+    <string name="answer_placeholder">Digite sua resposta</string>
+    <string name="submit_answer">RESPONDER</string>
+    <string name="incorrect_answer">Resposta incorreta. Tente novamente.</string>
+    <string name="correct_answer_with_stars">Correto! Você ganhou %1$d estrela(s).</string>
+    <string name="stage_coming_soon">Em breve</string>
+    <string name="tip_title">FASE %1$d · DICA %2$d</string>
+    <string name="tip_image_description">Imagem da dica %1$d</string>
+    <string name="stage1_riddle">Do que come saiu comida; do que é forte saiu doçura</string>
+    <string name="stage1_answer">O que é mais doce que o mel? O que é mais forte que o leão?</string>
+    <string name="stage1_tip_1">Juízes</string>
+    <string name="stage1_tip_2">Juízes 14:18</string>
+    <string name="correct_answer_label">RESPOSTA CORRETA</string>
+    <string name="play_riddle_audio">Reproduzir áudio do enigma</string>
+    <string name="stage2_answer">Davi</string>
+    <string name="stage2_tip_1">Já deu uma olhada em Salmos?</string>
+    <string name="stage2_tip_2">Ok, veja então 1 Samuel 16</string>
+    <string name="tips_button_description">Abrir menu de dicas. Restam %1$d pontos diários.</string>
+    <string name="tips_owned_count">%1$d compradas</string>
+    <string name="tips_menu_title">DICAS</string>
+    <string name="tip_points_balance">Disponíveis hoje: %1$d / 4 pontos</string>
+    <string name="tip_points_reset">Os quatro pontos são renovados à meia-noite. Dicas compradas podem ser reabertas grátis.</string>
+    <string name="tip_number">Dica %1$d</string>
+    <string name="tip_price">Preço: %1$d ponto(s)</string>
+    <string name="tip_open_free">Comprada · Abrir grátis</string>
+    <string name="tip_buy">Comprar e abrir</string>
+    <string name="tip_insufficient_points">Pontos insuficientes hoje</string>
+</resources>
