@@ -27,7 +27,6 @@ class Stage1Activity : ComponentActivity() {
     private var answer by mutableStateOf("")
     private var feedbackMessage by mutableStateOf<String?>(null)
     private var answerIsCorrect by mutableStateOf(false)
-    private var showTipsMenu by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,21 +48,11 @@ class Stage1Activity : ComponentActivity() {
                         }
                     },
                     onSubmitClick = ::submitAnswer,
-                    onTipClick = { showTipsMenu = true },
+                    onTipClick = {
+                        startActivity(StageTipsMenuActivity.createIntent(this, STAGE_NUMBER, STAGE_TIPS))
+                    },
                     onBackClick = ::finish,
                 )
-                if (showTipsMenu) {
-                    StageTipsMenu(
-                        stageNumber = STAGE_NUMBER,
-                        tips = STAGE_TIPS,
-                        localStorage = localStorage,
-                        onPlayerInfoChanged = { playerInfo = it },
-                        onOpenTip = { number, tip ->
-                            startActivity(TipActivity.createIntent(this, STAGE_NUMBER, number, tip))
-                        },
-                        onDismiss = { showTipsMenu = false },
-                    )
-                }
             }
         }
     }

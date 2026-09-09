@@ -111,7 +111,7 @@ fun StagesListScreen(
         Image(
             painter = painterResource(R.mipmap.stage_background),
             contentDescription = null,
-            contentScale = ContentScale.FillBounds,
+            contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize(),
         )
 
@@ -172,7 +172,7 @@ private fun StagesTopMenu(onBackClick: () -> Unit) {
             contentScale = ContentScale.Fit,
             modifier = Modifier
                 .align(Alignment.CenterStart)
-                .padding(start = 4.dp)
+                .padding(start = 11.dp, bottom = 8.dp)
                 .size(56.dp)
                 .clickable(role = Role.Button, onClick = onBackClick),
         )

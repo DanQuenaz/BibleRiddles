@@ -9,6 +9,7 @@
     <string name="continue_game">CONTINUAR</string>
     <string name="stages_list">PROGRESSO</string>
     <string name="back">Voltar</string>
+    <string name="close">Fechar</string>
     <string name="stage_locked_description">Fase %1$d, bloqueada</string>
     <string name="stage_current_description">Fase %1$d, atual</string>
     <string name="stage_score_description">Fase %1$d, pontuação de %2$d de 3 estrelas</string>
@@ -39,4 +40,11 @@
     <string name="tip_open_free">Comprada · Abrir grátis</string>
     <string name="tip_buy">Comprar e abrir</string>
     <string name="tip_insufficient_points">Pontos insuficientes hoje</string>
+    <string name="stage3_answer">4</string>
+    <string name="stage3_tip_1">No principio ...</string>
+    <string name="stage3_tip_2">Não está faltando nada?</string>
+    <string name="stage3_image_description">Imagem do enigma</string>
+    <string name="stage4_answer">Ezequiel</string>
+    <string name="stage4_tip_1">Tente olhar de outro angulo.</string>
+    <string name="stage4_tip_2">Tenha paciência.</string>
 </resources>

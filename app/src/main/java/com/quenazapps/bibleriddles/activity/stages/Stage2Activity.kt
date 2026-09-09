@@ -38,7 +38,6 @@ class Stage2Activity : ComponentActivity() {
     private var answer by mutableStateOf("")
     private var feedbackMessage by mutableStateOf<String?>(null)
     private var answerIsCorrect by mutableStateOf(false)
-    private var showTipsMenu by mutableStateOf(false)
     private var mediaPlayer: MediaPlayer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,21 +61,11 @@ class Stage2Activity : ComponentActivity() {
                     },
                     onPlaySoundClick = ::playPsalm,
                     onSubmitClick = ::submitAnswer,
-                    onTipClick = { showTipsMenu = true },
+                    onTipClick = {
+                        startActivity(StageTipsMenuActivity.createIntent(this, STAGE_NUMBER, STAGE_TIPS))
+                    },
                     onBackClick = ::finish,
                 )
-                if (showTipsMenu) {
-                    StageTipsMenu(
-                        stageNumber = STAGE_NUMBER,
-                        tips = STAGE_TIPS,
-                        localStorage = localStorage,
-                        onPlayerInfoChanged = { playerInfo = it },
-                        onOpenTip = { number, tip ->
-                            startActivity(TipActivity.createIntent(this, STAGE_NUMBER, number, tip))
-                        },
-                        onDismiss = { showTipsMenu = false },
-                    )
-                }
             }
         }
     }

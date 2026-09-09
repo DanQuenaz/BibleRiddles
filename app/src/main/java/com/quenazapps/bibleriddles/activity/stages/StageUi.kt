@@ -1,5 +1,7 @@
 package com.quenazapps.bibleriddles.activity.stages
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -114,6 +116,7 @@ internal fun StageAnswerForm(
     answerIsCorrect: Boolean,
     onAnswerChange: (String) -> Unit,
     onSubmitClick: () -> Unit,
+    compact: Boolean = false,
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -121,8 +124,8 @@ internal fun StageAnswerForm(
         value = answer,
         onValueChange = onAnswerChange,
         placeholder = { Text(stringResource(R.string.answer_placeholder)) },
-        minLines = 3,
-        maxLines = 5,
+        minLines = if (compact) 1 else 3,
+        maxLines = if (compact) 2 else 5,
         enabled = !answerIsCorrect,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(
@@ -142,7 +145,7 @@ internal fun StageAnswerForm(
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .height(132.dp),
+            .height(if (compact) 72.dp else 132.dp),
     )
 
     Spacer(modifier = Modifier.height(12.dp))
@@ -214,6 +217,8 @@ internal fun StageTopMenu(
     tipPointsRemainingToday: Int? = null,
     tipsUsedForStage: Int = 0,
     onTipClick: (() -> Unit)? = null,
+    @DrawableRes navigationIconRes: Int = R.mipmap.back_button,
+    @StringRes navigationDescriptionRes: Int = R.string.back,
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -229,12 +234,12 @@ internal fun StageTopMenu(
         )
 
         Image(
-            painter = painterResource(R.mipmap.back_button),
-            contentDescription = stringResource(R.string.back),
+            painter = painterResource(navigationIconRes),
+            contentDescription = stringResource(navigationDescriptionRes),
             contentScale = ContentScale.Fit,
             modifier = Modifier
                 .align(Alignment.CenterStart)
-                .padding(start = 4.dp)
+                .padding(start = 11.dp, bottom = 8.dp)
                 .size(56.dp)
                 .clickable(role = Role.Button, onClick = onBackClick),
         )
@@ -301,7 +306,7 @@ internal fun StageBackground() {
     Image(
         painter = painterResource(R.mipmap.stage_background),
         contentDescription = null,
-        contentScale = ContentScale.FillBounds,
+        contentScale = ContentScale.Crop,
         modifier = Modifier.fillMaxSize(),
     )
 }

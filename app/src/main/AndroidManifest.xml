@@ -24,6 +24,9 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".activity.stages.StageTipsMenuActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.stages.Stage1Activity"
             android:exported="false" />
         <activity
@@ -34,7 +37,9 @@
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage4Activity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="fullSensor"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activity.stages.Stage5Activity"
             android:exported="false" />
