@@ -2,4 +2,9 @@
 <resources>
 
     <style name="Theme.BibleRiddles" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.BibleRiddles.StageTransition" parent="Theme.BibleRiddles">
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
 </resources>

@@ -16,6 +16,14 @@ data class PlayerInfo(
     val hasPlayedAnyStage: Boolean
         get() = lastPlayedStage > 0 || stageScores.isNotEmpty()
 
+    /** Reviewing a completed stage must not redirect Continue away from unfinished progress. */
+    val stageToContinue: Int
+        get() = if (isStageUnlocked(lastPlayedStage) && scoreForStage(lastPlayedStage) == 0) {
+            lastPlayedStage
+        } else {
+            highestUnlockedStage.coerceIn(1, TOTAL_STAGES)
+        }
+
     fun scoreForStage(stageNumber: Int): Int =
         stageScores[stageNumber]?.coerceIn(0, MAX_STAGE_SCORE) ?: 0
 

@@ -1,6 +1,5 @@
 package com.quenazapps.bibleriddles.activity.stages
 
-import android.content.Intent
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -24,20 +23,25 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.lifecycleScope
 import com.quenazapps.bibleriddles.R
 import com.quenazapps.bibleriddles.activity.stages.ui.theme.BibleRiddlesTheme
 import com.quenazapps.bibleriddles.domain.PlayerInfo
 import com.quenazapps.bibleriddles.service.LocalStorage
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class Stage2Activity : ComponentActivity() {
+    private val stageAnswers by lazy {
+        StageAnswers(
+            mainAnswer = getString(R.string.stage2_answer),
+            alternativeAnswers = resources.getStringArray(R.array.stage2_accepted_answers).toList(),
+        )
+    }
+
     private lateinit var localStorage: LocalStorage
     private var playerInfo by mutableStateOf(PlayerInfo())
     private var answer by mutableStateOf("")
     private var feedbackMessage by mutableStateOf<String?>(null)
     private var answerIsCorrect by mutableStateOf(false)
+    private var openingNextStage = false
     private var mediaPlayer: MediaPlayer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,6 +49,9 @@ class Stage2Activity : ComponentActivity() {
         enableEdgeToEdge()
         localStorage = LocalStorage(this)
         playerInfo = localStorage.getPlayerInfo()
+        answer = savedInstanceState?.getString(STATE_ANSWER).orEmpty()
+        answerIsCorrect = savedInstanceState?.getBoolean(STATE_CORRECT) ?: false
+        feedbackMessage = savedInstanceState?.getString(STATE_FEEDBACK)
 
         setContent {
             BibleRiddlesTheme(dynamicColor = false) {
@@ -61,6 +68,7 @@ class Stage2Activity : ComponentActivity() {
                     },
                     onPlaySoundClick = ::playPsalm,
                     onSubmitClick = ::submitAnswer,
+                    onNextStageClick = ::openNextStage,
                     onTipClick = {
                         startActivity(StageTipsMenuActivity.createIntent(this, STAGE_NUMBER, STAGE_TIPS))
                     },
@@ -91,10 +99,17 @@ class Stage2Activity : ComponentActivity() {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString(STATE_ANSWER, answer)
+        outState.putBoolean(STATE_CORRECT, answerIsCorrect)
+        outState.putString(STATE_FEEDBACK, feedbackMessage)
+        super.onSaveInstanceState(outState)
+    }
+
     private fun submitAnswer() {
         playerInfo = localStorage.getPlayerInfo()
         if (answerIsCorrect || playerInfo.scoreForStage(STAGE_NUMBER) > 0) return
-        if (normalizeAnswer(answer) != normalizeAnswer(getString(R.string.stage2_answer))) {
+        if (!stageAnswers.accepts(answer)) {
             feedbackMessage = getString(R.string.incorrect_answer)
             return
         }
@@ -105,12 +120,6 @@ class Stage2Activity : ComponentActivity() {
         releasePsalm()
         answerIsCorrect = true
         feedbackMessage = getString(R.string.correct_answer_with_stars, score)
-
-        lifecycleScope.launch {
-            delay(NEXT_STAGE_DELAY_MILLIS)
-            startActivity(Intent(this@Stage2Activity, Stage3Activity::class.java))
-            finish()
-        }
     }
 
     private fun releasePsalm() {
@@ -118,9 +127,18 @@ class Stage2Activity : ComponentActivity() {
         mediaPlayer = null
     }
 
+    private fun openNextStage() {
+        if (!answerIsCorrect || openingNextStage) return
+        openingNextStage = true
+        startActivity(StageTransitionActivity.createIntent(this, STAGE_NUMBER + 1))
+        finish()
+    }
+
     private companion object {
         const val STAGE_NUMBER = 2
-        const val NEXT_STAGE_DELAY_MILLIS = 1_500L
+        const val STATE_ANSWER = "answer"
+        const val STATE_CORRECT = "correct"
+        const val STATE_FEEDBACK = "feedback"
         val STAGE_TIPS = listOf(
             StageTip.TextTip(id = "tip_1", cost = 1, textRes = R.string.stage2_tip_1),
             StageTip.TextTip(id = "tip_2", cost = 2, textRes = R.string.stage2_tip_2),
@@ -137,10 +155,11 @@ private fun Stage2Screen(
     onAnswerChange: (String) -> Unit,
     onPlaySoundClick: () -> Unit,
     onSubmitClick: () -> Unit,
+    onNextStageClick: () -> Unit,
     onTipClick: () -> Unit,
     onBackClick: () -> Unit,
 ) {
-    if (playerInfo.scoreForStage(2) > 0) {
+    if (playerInfo.scoreForStage(2) > 0 && !answerIsCorrect) {
         StageLayout(
             stageNumber = 2,
             onBackClick = onBackClick,
@@ -179,6 +198,7 @@ private fun Stage2Screen(
             answerIsCorrect = answerIsCorrect,
             onAnswerChange = onAnswerChange,
             onSubmitClick = onSubmitClick,
+            onNextStageClick = onNextStageClick,
         )
     }
 }

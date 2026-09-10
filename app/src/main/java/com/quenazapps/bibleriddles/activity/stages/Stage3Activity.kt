@@ -1,6 +1,5 @@
 package com.quenazapps.bibleriddles.activity.stages
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -22,20 +21,25 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.lifecycleScope
 import com.quenazapps.bibleriddles.R
 import com.quenazapps.bibleriddles.activity.stages.ui.theme.BibleRiddlesTheme
 import com.quenazapps.bibleriddles.domain.PlayerInfo
 import com.quenazapps.bibleriddles.service.LocalStorage
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class Stage3Activity : ComponentActivity() {
+    private val stageAnswers by lazy {
+        StageAnswers(
+            mainAnswer = getString(R.string.stage3_answer),
+            alternativeAnswers = resources.getStringArray(R.array.stage3_accepted_answers).toList(),
+        )
+    }
+
     private lateinit var localStorage: LocalStorage
     private var playerInfo by mutableStateOf(PlayerInfo())
     private var answer by mutableStateOf("")
     private var feedbackMessage by mutableStateOf<String?>(null)
     private var answerIsCorrect by mutableStateOf(false)
+    private var openingNextStage = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +47,8 @@ class Stage3Activity : ComponentActivity() {
         localStorage = LocalStorage(this)
         playerInfo = localStorage.getPlayerInfo()
         answer = savedInstanceState?.getString(STATE_ANSWER).orEmpty()
+        answerIsCorrect = savedInstanceState?.getBoolean(STATE_CORRECT) ?: false
+        feedbackMessage = savedInstanceState?.getString(STATE_FEEDBACK)
 
         setContent {
             BibleRiddlesTheme(dynamicColor = false) {
@@ -58,6 +64,7 @@ class Stage3Activity : ComponentActivity() {
                         }
                     },
                     onSubmitClick = ::submitAnswer,
+                    onNextStageClick = ::openNextStage,
                     onTipClick = {
                         startActivity(StageTipsMenuActivity.createIntent(this, STAGE_NUMBER, STAGE_TIPS))
                     },
@@ -74,13 +81,15 @@ class Stage3Activity : ComponentActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putString(STATE_ANSWER, answer)
+        outState.putBoolean(STATE_CORRECT, answerIsCorrect)
+        outState.putString(STATE_FEEDBACK, feedbackMessage)
         super.onSaveInstanceState(outState)
     }
 
     private fun submitAnswer() {
         playerInfo = localStorage.getPlayerInfo()
         if (answerIsCorrect || playerInfo.scoreForStage(STAGE_NUMBER) > 0) return
-        if (normalizeAnswer(answer) != normalizeAnswer(getString(R.string.stage3_answer))) {
+        if (!stageAnswers.accepts(answer)) {
             feedbackMessage = getString(R.string.incorrect_answer)
             return
         }
@@ -90,17 +99,20 @@ class Stage3Activity : ComponentActivity() {
         localStorage.savePlayerInfo(playerInfo)
         answerIsCorrect = true
         feedbackMessage = getString(R.string.correct_answer_with_stars, score)
+    }
 
-        lifecycleScope.launch {
-            delay(1_500L)
-            startActivity(Intent(this@Stage3Activity, Stage4Activity::class.java))
-            finish()
-        }
+    private fun openNextStage() {
+        if (!answerIsCorrect || openingNextStage) return
+        openingNextStage = true
+        startActivity(StageTransitionActivity.createIntent(this, STAGE_NUMBER + 1))
+        finish()
     }
 
     private companion object {
         const val STAGE_NUMBER = 3
         const val STATE_ANSWER = "answer"
+        const val STATE_CORRECT = "correct"
+        const val STATE_FEEDBACK = "feedback"
         val STAGE_TIPS = listOf(
             StageTip.TextTip(id = "tip_1", cost = 1, textRes = R.string.stage3_tip_1),
             StageTip.TextTip(id = "tip_2", cost = 2, textRes = R.string.stage3_tip_2),
@@ -116,6 +128,7 @@ private fun Stage3Screen(
     answerIsCorrect: Boolean,
     onAnswerChange: (String) -> Unit,
     onSubmitClick: () -> Unit,
+    onNextStageClick: () -> Unit,
     onTipClick: () -> Unit,
     onBackClick: () -> Unit,
 ) {
@@ -141,6 +154,7 @@ private fun Stage3Screen(
                 answerIsCorrect = answerIsCorrect,
                 onAnswerChange = onAnswerChange,
                 onSubmitClick = onSubmitClick,
+                onNextStageClick = onNextStageClick,
             )
         }
     }

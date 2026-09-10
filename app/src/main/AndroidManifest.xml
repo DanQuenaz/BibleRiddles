@@ -4,15 +4,32 @@
 
     <application
         android:allowBackup="true"
+        android:appCategory="game"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:resizeableActivity="false"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.BibleRiddles">
+        <!-- Games retain fixed-orientation support on Android 16/17 large screens.
+             Keep tablet compatibility treatments from replacing portrait requests. -->
+        <property
+            android:name="android.window.PROPERTY_COMPAT_ALLOW_ORIENTATION_OVERRIDE"
+            android:value="false" />
+        <property
+            android:name="android.window.PROPERTY_COMPAT_ALLOW_DISPLAY_ORIENTATION_OVERRIDE"
+            android:value="false" />
+        <property
+            android:name="android.window.PROPERTY_COMPAT_ALLOW_RESIZEABLE_ACTIVITY_OVERRIDES"
+            android:value="false" />
+        <property
+            android:name="android.window.PROPERTY_COMPAT_ALLOW_USER_ASPECT_RATIO_FULLSCREEN_OVERRIDE"
+            android:value="false" />
         <activity
             android:name=".MainActivity"
+            android:screenOrientation="portrait"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.BibleRiddles"
@@ -25,176 +42,235 @@
         </activity>
         <activity
             android:name=".activity.stages.StageTipsMenuActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+        <activity
+            android:name=".activity.stages.StageTransitionActivity"
+            android:theme="@style/Theme.BibleRiddles.StageTransition"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage1Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage2Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage3Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage4Activity"
+            android:screenOrientation="portrait"
             android:exported="false"
-            android:screenOrientation="fullSensor"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activity.stages.Stage5Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage6Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage7Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage8Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage9Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage10Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage11Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage12Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage13Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage14Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage15Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage16Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage17Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage18Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage19Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage20Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage21Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage22Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage23Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage24Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage25Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage26Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage27Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage28Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage29Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage30Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage31Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage32Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage33Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage34Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage35Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage36Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage37Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage38Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage39Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage40Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage41Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage42Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage43Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage44Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage45Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage46Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage47Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage48Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage49Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.Stage50Activity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.stages.TipActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".activity.ConfigurationActivity"
+            android:screenOrientation="portrait"
             android:exported="false"
             android:label="@string/title_activity_configuration"
             android:theme="@style/Theme.BibleRiddles"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".MainMenuActivity"
+            android:screenOrientation="portrait"
             android:exported="false"
             android:label="@string/title_activity_main_menu"
             android:theme="@style/Theme.BibleRiddles"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activity.StagesListActivity"
+            android:screenOrientation="portrait"
             android:exported="false"
             android:label="@string/title_activity_stages_list"
             android:theme="@style/Theme.BibleRiddles"

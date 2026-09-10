@@ -1,6 +1,5 @@
 package com.quenazapps.bibleriddles.activity.stages
 
-import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
 import android.view.OrientationEventListener
@@ -39,17 +38,23 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class Stage4Activity : ComponentActivity() {
+    private val stageAnswers by lazy {
+        StageAnswers(
+            mainAnswer = getString(R.string.stage4_answer),
+            alternativeAnswers = resources.getStringArray(R.array.stage4_accepted_answers).toList(),
+        )
+    }
+
     private lateinit var localStorage: LocalStorage
     private lateinit var orientationListener: OrientationEventListener
     private var playerInfo by mutableStateOf(PlayerInfo())
     private var answer by mutableStateOf("")
     private var feedbackMessage by mutableStateOf<String?>(null)
     private var answerIsCorrect by mutableStateOf(false)
+    private var openingNextStage = false
     private var counter by mutableStateOf(Stage4CounterState())
     private var counterJob: Job? = null
     private var lastCounterTick: Long? = null
-    private var nextStageAt: Long? = null
-    private var nextStageJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,7 +64,6 @@ class Stage4Activity : ComponentActivity() {
         answer = savedInstanceState?.getString(STATE_ANSWER).orEmpty()
         answerIsCorrect = savedInstanceState?.getBoolean(STATE_CORRECT) ?: false
         feedbackMessage = savedInstanceState?.getString(STATE_FEEDBACK)
-        nextStageAt = savedInstanceState?.getLong(STATE_NEXT_STAGE)?.takeIf { it > 0L }
         counter = Stage4CounterState(
             side = Stage4Side.entries.firstOrNull { it.name == savedInstanceState?.getString(STATE_SIDE) },
             elapsedMillis = savedInstanceState?.getLong(STATE_ELAPSED) ?: 0L,
@@ -85,6 +89,7 @@ class Stage4Activity : ComponentActivity() {
                         }
                     },
                     onSubmitClick = ::submitAnswer,
+                    onNextStageClick = ::openNextStage,
                     onTipClick = {
                         if (!answerIsCorrect) {
                             startActivity(StageTipsMenuActivity.createIntent(this, STAGE_NUMBER, STAGE_TIPS))
@@ -107,7 +112,6 @@ class Stage4Activity : ComponentActivity() {
                 updateCounterTime()
             }
         }
-        scheduleNextStage()
     }
 
     override fun onPause() {
@@ -116,8 +120,6 @@ class Stage4Activity : ComponentActivity() {
         counterJob?.cancel()
         counterJob = null
         orientationListener.disable()
-        nextStageJob?.cancel()
-        nextStageJob = null
         super.onPause()
     }
 
@@ -128,7 +130,6 @@ class Stage4Activity : ComponentActivity() {
         outState.putString(STATE_FEEDBACK, feedbackMessage)
         outState.putString(STATE_SIDE, counter.side?.name)
         outState.putLong(STATE_ELAPSED, counter.elapsedMillis)
-        outState.putLong(STATE_NEXT_STAGE, nextStageAt ?: 0L)
         super.onSaveInstanceState(outState)
     }
 
@@ -142,7 +143,7 @@ class Stage4Activity : ComponentActivity() {
     private fun submitAnswer() {
         playerInfo = localStorage.getPlayerInfo()
         if (answerIsCorrect || playerInfo.scoreForStage(STAGE_NUMBER) > 0) return
-        if (normalizeAnswer(answer) != normalizeAnswer(getString(R.string.stage4_answer))) {
+        if (!stageAnswers.accepts(answer)) {
             feedbackMessage = getString(R.string.incorrect_answer)
             return
         }
@@ -151,19 +152,13 @@ class Stage4Activity : ComponentActivity() {
         localStorage.savePlayerInfo(playerInfo)
         answerIsCorrect = true
         feedbackMessage = getString(R.string.correct_answer_with_stars, score)
-        nextStageAt = SystemClock.elapsedRealtime() + 1_500L
-        scheduleNextStage()
     }
 
-    private fun scheduleNextStage() {
-        val deadline = nextStageAt ?: return
-        nextStageJob?.cancel()
-        nextStageJob = lifecycleScope.launch {
-            delay((deadline - SystemClock.elapsedRealtime()).coerceAtLeast(0L))
-            nextStageAt = null
-            startActivity(Intent(this@Stage4Activity, Stage5Activity::class.java))
-            finish()
-        }
+    private fun openNextStage() {
+        if (!answerIsCorrect || openingNextStage) return
+        openingNextStage = true
+        startActivity(StageTransitionActivity.createIntent(this, STAGE_NUMBER + 1))
+        finish()
     }
 
     private companion object {
@@ -173,7 +168,6 @@ class Stage4Activity : ComponentActivity() {
         const val STATE_FEEDBACK = "feedback"
         const val STATE_SIDE = "counter_side"
         const val STATE_ELAPSED = "counter_elapsed"
-        const val STATE_NEXT_STAGE = "next_stage_at"
         val STAGE_TIPS = listOf(
             StageTip.TextTip(id = "tip_1", cost = 1, textRes = R.string.stage4_tip_1),
             StageTip.TextTip(id = "tip_2", cost = 1, textRes = R.string.stage4_tip_2),
@@ -190,6 +184,7 @@ private fun Stage4Screen(
     answerIsCorrect: Boolean,
     onAnswerChange: (String) -> Unit,
     onSubmitClick: () -> Unit,
+    onNextStageClick: () -> Unit,
     onTipClick: () -> Unit,
     onBackClick: () -> Unit,
 ) {
@@ -226,6 +221,7 @@ private fun Stage4Screen(
                             answerIsCorrect = answerIsCorrect,
                             onAnswerChange = onAnswerChange,
                             onSubmitClick = onSubmitClick,
+                            onNextStageClick = onNextStageClick,
                             compact = compact,
                         )
                     }

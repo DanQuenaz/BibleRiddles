@@ -1,7 +1,7 @@
 package com.quenazapps.bibleriddles.activity.stages
 
 internal enum class Stage4Side(val limit: Int) {
-    LEFT(340), RIGHT(40),
+    LEFT(390), RIGHT(40),
 }
 
 /** Only time spent in the foreground counts. Sensor jitter must not restart the puzzle. */

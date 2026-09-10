@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.quenazapps.bibleriddles.activity.StagesListActivity
 import com.quenazapps.bibleriddles.activity.stages.stageActivityClass
+import com.quenazapps.bibleriddles.activity.stages.StageTransitionActivity
 import com.quenazapps.bibleriddles.domain.PlayerInfo
 import com.quenazapps.bibleriddles.service.LocalStorage
 import com.quenazapps.bibleriddles.ui.theme.BibleRiddlesTheme
@@ -78,14 +79,17 @@ class MainMenuActivity : ComponentActivity() {
     }
 
     private fun openCurrentStage() {
-        val stageNumber = if (playerInfo.hasPlayedAnyStage) {
-            playerInfo.lastPlayedStage
-        } else {
-            playerInfo.highestUnlockedStage
-        }
+        playerInfo = localStorage.getPlayerInfo()
+        val stageNumber = playerInfo.stageToContinue
         playerInfo = playerInfo.withStageStarted(stageNumber)
         localStorage.savePlayerInfo(playerInfo)
-        startActivity(Intent(this, stageActivityClass(stageNumber)))
+        startActivity(
+            if (playerInfo.scoreForStage(stageNumber) > 0) {
+                Intent(this, stageActivityClass(stageNumber))
+            } else {
+                StageTransitionActivity.createIntent(this, stageNumber)
+            },
+        )
     }
 }
 

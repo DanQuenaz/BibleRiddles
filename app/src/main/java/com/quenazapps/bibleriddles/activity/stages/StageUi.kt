@@ -45,8 +45,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.quenazapps.bibleriddles.R
-import java.text.Normalizer
-import java.util.Locale
 
 /** Shared visual shell. Each stage supplies its own independent content and behavior. */
 @Composable
@@ -116,6 +114,7 @@ internal fun StageAnswerForm(
     answerIsCorrect: Boolean,
     onAnswerChange: (String) -> Unit,
     onSubmitClick: () -> Unit,
+    onNextStageClick: () -> Unit,
     compact: Boolean = false,
 ) {
     val focusManager = LocalFocusManager.current
@@ -151,11 +150,11 @@ internal fun StageAnswerForm(
     Spacer(modifier = Modifier.height(12.dp))
 
     StageImageButton(
-        text = stringResource(R.string.submit_answer),
-        enabled = !answerIsCorrect,
+        text = stringResource(if (answerIsCorrect) R.string.next_stage else R.string.submit_answer),
+        enabled = true,
         onClick = {
             focusManager.clearFocus()
-            onSubmitClick()
+            if (answerIsCorrect) onNextStageClick() else onSubmitClick()
         },
     )
 
@@ -336,13 +335,5 @@ private fun StageImageButton(text: String, enabled: Boolean, onClick: () -> Unit
         )
     }
 }
-
-internal fun normalizeAnswer(value: String): String = Normalizer
-    .normalize(value, Normalizer.Form.NFD)
-    .replace("\\p{M}+".toRegex(), "")
-    .lowercase(Locale.ROOT)
-    .replace("[.,!?;:]".toRegex(), " ")
-    .replace("\\s+".toRegex(), " ")
-    .trim()
 
 internal val STAGE_TOP_MENU_HEIGHT = 72.dp

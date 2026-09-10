@@ -16,6 +16,7 @@
     <string name="stage_title">FASE %1$d</string>
     <string name="answer_placeholder">Digite sua resposta</string>
     <string name="submit_answer">RESPONDER</string>
+    <string name="next_stage">PRÓXIMA FASE</string>
     <string name="incorrect_answer">Resposta incorreta. Tente novamente.</string>
     <string name="correct_answer_with_stars">Correto! Você ganhou %1$d estrela(s).</string>
     <string name="stage_coming_soon">Em breve</string>

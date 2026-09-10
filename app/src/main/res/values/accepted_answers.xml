@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Main answers remain in stageN_answer strings. Add other accepted forms here.
+         Case, accents, punctuation, and whitespace variants need not be duplicated. -->
+    <string-array name="stage1_accepted_answers" translatable="false">
+        <item>Que coisa há mais doce do que o mel e mais forte do que o leão?</item>
+        <item>Que coisa há mais doce do que o mel? E que coisa há mais forte do que o leão?</item>
+        <item>O que pode ser mais doce do que o mel? E o que é mais forte do que o leão?</item>
+        <item>Que coisa é mais doce do que o mel e mais forte do que o leão?</item>
+    </string-array>
+    <string-array name="stage2_accepted_answers" translatable="false">
+        <item>Rei Davi</item>
+        <item>O rei Davi</item>
+        <item>David</item>
+        <item>Rei David</item>
+        <item>O rei David</item>
+    </string-array>
+    <string-array name="stage3_accepted_answers" translatable="false">
+        <item>Quatro</item>
+        <item>Dia 4</item>
+        <item>4º dia</item>
+        <item>Quarto dia</item>
+        <item>O quarto dia</item>
+        <item>Quarto dia da criação</item>
+    </string-array>
+    <string-array name="stage4_accepted_answers" translatable="false">
+        <item>Profeta Ezequiel</item>
+        <item>O profeta Ezequiel</item>
+        <item>Ezekiel</item>
+    </string-array>
+</resources>
