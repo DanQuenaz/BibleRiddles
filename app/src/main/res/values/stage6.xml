@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="stage6_year" translatable="false">1844</string>
+    <string name="stage6_coordinate_copied" translatable="false">Coordinate copied ...</string>
+    <string name="stage6_coordinates" translatable="false">37.9398° N, 27.3411° E\n38.4186° N, 27.1391° E\n39.1322° N, 27.1841° E\n38.9228° N, 27.8403° E\n38.4883° N, 28.0403° E\n38.3492° N, 28.5175° E\n37.8358° N, 29.1075° E</string>
+    <string name="stage6_answer" translatable="false">LAODICEIA</string>
+    <string name="stage6_tip_1" translatable="false">Isso se parecem coordenadas geograficas ...</string>
+    <string name="stage6_tip_2" translatable="false">Coordenadas geográficas servem para apontar uma localização precisa ...</string>
+    <string-array name="stage6_accepted_answers" translatable="false" />
+</resources>

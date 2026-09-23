@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="stage7_image_description" translatable="false">Triângulo com ângulos de 120° e 50° e um terceiro ângulo marcado com uma interrogação.</string>
+    <string name="stage7_answer" translatable="false">EZEQUIAS</string>
+    <string name="stage7_tip_1" translatable="false">Vamos lá, trigonometria básica ...</string>
+    <string name="stage7_tip_2" translatable="false">Ok ... A soma dos ângulos internos de um triângulo é sempre 180 graus.</string>
+    <string-array name="stage7_accepted_answers" translatable="false" />
+</resources>

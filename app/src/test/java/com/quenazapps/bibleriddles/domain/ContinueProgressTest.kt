@@ -22,8 +22,9 @@ class ContinueProgressTest {
         assertEquals(3, player.stageToContinue)
     }
 
-    @Test fun finalStageNeverAdvancesBeyondFifty() {
-        val player = PlayerInfo(highestUnlockedStage = 50).withStageScore(50, 3)
-        assertEquals(50, player.stageToContinue)
+    @Test fun finalStageNeverAdvancesBeyondTheStageCount() {
+        val player = PlayerInfo(highestUnlockedStage = PlayerInfo.TOTAL_STAGES)
+            .withStageScore(PlayerInfo.TOTAL_STAGES, 3)
+        assertEquals(PlayerInfo.TOTAL_STAGES, player.stageToContinue)
     }
 }

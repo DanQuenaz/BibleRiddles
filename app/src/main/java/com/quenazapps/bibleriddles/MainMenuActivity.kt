@@ -41,10 +41,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.quenazapps.bibleriddles.activity.StagesListActivity
+import com.quenazapps.bibleriddles.activity.TutorialActivity
 import com.quenazapps.bibleriddles.activity.stages.stageActivityClass
 import com.quenazapps.bibleriddles.activity.stages.StageTransitionActivity
 import com.quenazapps.bibleriddles.domain.PlayerInfo
 import com.quenazapps.bibleriddles.service.LocalStorage
+import com.quenazapps.bibleriddles.ui.MenuGifBackground
 import com.quenazapps.bibleriddles.ui.theme.BibleRiddlesTheme
 
 class MainMenuActivity : ComponentActivity() {
@@ -65,6 +67,9 @@ class MainMenuActivity : ComponentActivity() {
                     onStartClick = ::openCurrentStage,
                     onStagesListClick = {
                         startActivity(Intent(this, StagesListActivity::class.java))
+                    },
+                    onTutorialClick = {
+                        startActivity(Intent(this, TutorialActivity::class.java))
                     },
                 )
             }
@@ -98,6 +103,7 @@ fun MainMenuScreen(
     hasPlayedAnyStage: Boolean,
     onStartClick: () -> Unit,
     onStagesListClick: () -> Unit,
+    onTutorialClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(
@@ -108,20 +114,15 @@ fun MainMenuScreen(
         val isPortrait = maxHeight >= maxWidth
         val logoSize = minOf(
             maxWidth * if (isPortrait) 0.90f else 0.36f,
-            maxHeight * if (isPortrait) 0.43f else 0.30f,
+            maxHeight * if (isPortrait) 0.34f else 0.30f,
         )
         val buttonWidth = minOf(
             maxWidth * 0.86f,
-            maxHeight * if (isPortrait) 0.72f else 0.66f,
+            maxHeight * if (isPortrait) 0.60f else 0.50f,
         )
-        val bottomSpacing = if (isPortrait) maxHeight * 0.10f else 0.dp
+        val bottomSpacing = if (isPortrait) maxHeight * 0.04f else 0.dp
 
-        Image(
-            painter = painterResource(R.mipmap.main_background),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize(),
-        )
+        MenuGifBackground(modifier = Modifier.fillMaxSize())
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -134,10 +135,12 @@ fun MainMenuScreen(
                 painter = painterResource(R.mipmap.logo),
                 contentDescription = stringResource(R.string.game_logo_description),
                 contentScale = ContentScale.Fit,
-                modifier = Modifier.size(logoSize),
+                modifier = Modifier
+                    .weight(1f, fill = false)
+                    .size(logoSize),
             )
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(0.15f))
 
             MenuImageButton(
                 text = stringResource(
@@ -153,6 +156,14 @@ fun MainMenuScreen(
                 text = stringResource(R.string.stages_list),
                 width = buttonWidth,
                 onClick = onStagesListClick,
+            )
+
+            Spacer(modifier = Modifier.height(if (isPortrait) 16.dp else 8.dp))
+
+            MenuImageButton(
+                text = stringResource(R.string.tutorial_title),
+                width = buttonWidth,
+                onClick = onTutorialClick,
             )
 
             Spacer(
@@ -213,6 +224,7 @@ private fun MainMenuPreview() {
             hasPlayedAnyStage = false,
             onStartClick = {},
             onStagesListClick = {},
+            onTutorialClick = {},
         )
     }
 }

@@ -17,7 +17,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class Stage3RiddleTest {
+class Stage4RiddleTest {
     @get:Rule val compose = createComposeRule()
 
     @Test
@@ -25,11 +25,11 @@ class Stage3RiddleTest {
         assertEquals(listOf(
             R.mipmap.creation_1, R.mipmap.creation_2, R.mipmap.creation_3,
             R.mipmap.creation_5, R.mipmap.creation_6, R.mipmap.creation_7,
-        ), STAGE3_IMAGES)
+        ), STAGE4_IMAGES)
         lateinit var pager: PagerState
         compose.setContent {
-            pager = rememberPagerState { STAGE3_IMAGES.size }
-            Stage3Riddle(modifier = Modifier.testTag("riddle"), pagerState = pager)
+            pager = rememberPagerState { STAGE4_IMAGES.size }
+            Stage4Riddle(modifier = Modifier.testTag("riddle"), pagerState = pager)
         }
         fun assertPage(expected: Int) = compose.runOnIdle {
             assertEquals(expected, pager.currentPage)

@@ -1,28 +1,25 @@
 package com.quenazapps.bibleriddles.activity.stages
 
-import android.media.AudioAttributes
-import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import com.quenazapps.bibleriddles.R
 import com.quenazapps.bibleriddles.activity.stages.ui.theme.BibleRiddlesTheme
 import com.quenazapps.bibleriddles.domain.PlayerInfo
@@ -42,14 +39,13 @@ class Stage2Activity : ComponentActivity() {
     private var feedbackMessage by mutableStateOf<String?>(null)
     private var answerIsCorrect by mutableStateOf(false)
     private var openingNextStage = false
-    private var mediaPlayer: MediaPlayer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         localStorage = LocalStorage(this)
         playerInfo = localStorage.getPlayerInfo()
-        answer = savedInstanceState?.getString(STATE_ANSWER).orEmpty()
+        answer = filterAnswerInput(savedInstanceState?.getString(STATE_ANSWER).orEmpty())
         answerIsCorrect = savedInstanceState?.getBoolean(STATE_CORRECT) ?: false
         feedbackMessage = savedInstanceState?.getString(STATE_FEEDBACK)
 
@@ -66,7 +62,6 @@ class Stage2Activity : ComponentActivity() {
                             feedbackMessage = null
                         }
                     },
-                    onPlaySoundClick = ::playPsalm,
                     onSubmitClick = ::submitAnswer,
                     onNextStageClick = ::openNextStage,
                     onTipClick = {
@@ -81,22 +76,6 @@ class Stage2Activity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         if (::localStorage.isInitialized) playerInfo = localStorage.getPlayerInfo()
-    }
-
-    override fun onStop() {
-        releasePsalm()
-        super.onStop()
-    }
-
-    private fun playPsalm() {
-        releasePsalm()
-        val audioAttributes = AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_GAME)
-            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-            .build()
-        mediaPlayer = MediaPlayer.create(this, R.raw.psalm_23, audioAttributes, 0)?.apply {
-            start()
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -117,14 +96,8 @@ class Stage2Activity : ComponentActivity() {
         val score = (3 - playerInfo.tipsUsedForStage(STAGE_NUMBER)).coerceIn(1, 3)
         playerInfo = playerInfo.withStageScore(STAGE_NUMBER, score)
         localStorage.savePlayerInfo(playerInfo)
-        releasePsalm()
         answerIsCorrect = true
         feedbackMessage = getString(R.string.correct_answer_with_stars, score)
-    }
-
-    private fun releasePsalm() {
-        mediaPlayer?.release()
-        mediaPlayer = null
     }
 
     private fun openNextStage() {
@@ -147,18 +120,45 @@ class Stage2Activity : ComponentActivity() {
 }
 
 @Composable
-private fun Stage2Screen(
+internal fun Stage2Screen(
     playerInfo: PlayerInfo,
     answer: String,
     feedbackMessage: String?,
     answerIsCorrect: Boolean,
     onAnswerChange: (String) -> Unit,
-    onPlaySoundClick: () -> Unit,
     onSubmitClick: () -> Unit,
     onNextStageClick: () -> Unit,
     onTipClick: () -> Unit,
     onBackClick: () -> Unit,
 ) {
+    val riddleText = androidx.compose.ui.res.stringResource(R.string.stage2_riddle)
+    var cluesRevealed by remember { mutableStateOf(false) }
+    val riddle = buildAnnotatedString {
+        append(riddleText)
+        if (cluesRevealed) {
+            Regex("\\b(comida|doçura)\\b", RegexOption.IGNORE_CASE).findAll(riddleText).forEach { match ->
+                addStyle(SpanStyle(fontWeight = FontWeight.Bold), match.range.first, match.range.last + 1)
+            }
+        }
+    }
+    val revealOnTouch = Modifier.pointerInput(Unit) {
+        awaitEachGesture {
+            awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+            try {
+                cluesRevealed = true
+                do {
+                    val event = awaitPointerEvent(PointerEventPass.Initial)
+                    cluesRevealed = event.changes.any {
+                        it.pressed && it.position.x in 0f..size.width.toFloat() &&
+                            it.position.y in 0f..size.height.toFloat()
+                    }
+                } while (event.changes.any { it.pressed })
+            } finally {
+                cluesRevealed = false
+            }
+        }
+    }
+
     if (playerInfo.scoreForStage(2) > 0 && !answerIsCorrect) {
         StageLayout(
             stageNumber = 2,
@@ -167,10 +167,12 @@ private fun Stage2Screen(
             tipsUsedForStage = playerInfo.tipsUsedForStage(2),
             onTipClick = onTipClick,
         ) {
-            CompletedStageReview(correctAnswer = stringResource(R.string.stage2_answer)) {
-                Stage2SoundButton(
-                    onClick = onPlaySoundClick,
-                    modifier = Modifier.align(Alignment.Center),
+            CompletedStageReview(
+                correctAnswer = androidx.compose.ui.res.stringResource(R.string.stage2_answer),
+            ) {
+                StageTextRiddle(
+                    text = riddle,
+                    modifier = Modifier.align(Alignment.Center).then(revealOnTouch),
                 )
             }
         }
@@ -190,7 +192,7 @@ private fun Stage2Screen(
                 .fillMaxWidth()
                 .weight(1f),
         ) {
-            Stage2SoundButton(onClick = onPlaySoundClick)
+            StageTextRiddle(text = riddle, modifier = revealOnTouch)
         }
         StageAnswerForm(
             answer = answer,
@@ -201,19 +203,4 @@ private fun Stage2Screen(
             onNextStageClick = onNextStageClick,
         )
     }
-}
-
-@Composable
-private fun Stage2SoundButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Image(
-        painter = painterResource(R.mipmap.sound),
-        contentDescription = stringResource(R.string.play_riddle_audio),
-        contentScale = ContentScale.Fit,
-        modifier = modifier
-            .size(230.dp)
-            .clickable(role = Role.Button, onClick = onClick),
-    )
 }

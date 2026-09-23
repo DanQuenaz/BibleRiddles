@@ -54,6 +54,7 @@ private val stageActivities: List<Class<out Activity>> = listOf(
     Stage48Activity::class.java,
     Stage49Activity::class.java,
     Stage50Activity::class.java,
+    Stage51Activity::class.java,
 )
 
 fun stageActivityClass(stageNumber: Int): Class<out Activity> =

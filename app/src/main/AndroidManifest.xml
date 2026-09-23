@@ -64,12 +64,12 @@
         <activity
             android:name=".activity.stages.Stage4Activity"
             android:screenOrientation="portrait"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
+            android:exported="false" />
         <activity
             android:name=".activity.stages.Stage5Activity"
             android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activity.stages.Stage6Activity"
             android:screenOrientation="portrait"
@@ -251,6 +251,10 @@
             android:screenOrientation="portrait"
             android:exported="false" />
         <activity
+            android:name=".activity.stages.Stage51Activity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+        <activity
             android:name=".activity.stages.TipActivity"
             android:screenOrientation="portrait"
             android:exported="false" />
@@ -268,6 +272,12 @@
             android:label="@string/title_activity_main_menu"
             android:theme="@style/Theme.BibleRiddles"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".activity.TutorialActivity"
+            android:screenOrientation="portrait"
+            android:exported="false"
+            android:label="@string/tutorial_title"
+            android:theme="@style/Theme.BibleRiddles" />
         <activity
             android:name=".activity.StagesListActivity"
             android:screenOrientation="portrait"

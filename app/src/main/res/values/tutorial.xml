@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tutorial_title" translatable="false">INSTRUÇÕES</string>
+    <string name="tutorial_step_1" translatable="false">&lt;b&gt;Seja bem-vindo, peregrino!&lt;/b&gt;&lt;br&gt;Diante de ti está uma jornada de enigmas inspirados nas histórias, personagens e mistérios das Sagradas Escrituras.</string>
+    <string name="tutorial_step_2" translatable="false">&lt;b&gt;Atenta para esta regra:&lt;/b&gt; a resposta de cada enigma será sempre &lt;b&gt;uma única palavra ou um número&lt;/b&gt;. Não escrevas frases, nem deixes espaços.</string>
+    <string name="tutorial_step_3" translatable="false">Se o caminho parecer difícil e a resposta estiver oculta aos teus olhos, poderás recorrer às &lt;b&gt;pistas&lt;/b&gt;, no canto superior direito.</string>
+    <string name="tutorial_step_4" translatable="false">Para cada enigma foram preparadas &lt;b&gt;ao menos duas pistas&lt;/b&gt;, capazes de lançar luz sobre o teu caminho.</string>
+    <string name="tutorial_step_5" translatable="false">&lt;b&gt;Mas acautela-te!&lt;/b&gt; Toda ajuda tem o seu preço. Cada pista exigirá uma determinada quantidade de &lt;b&gt;Pontos de Pista&lt;/b&gt;.</string>
+    <string name="tutorial_step_6" translatable="false">A cada dia receberás apenas &lt;b&gt;4 Pontos de Pista&lt;/b&gt;. Portanto, administra-os com sabedoria, pois preciosos são os recursos daquele que ainda tem muitos mistérios diante de si.</string>
+    <string name="tutorial_step_7" translatable="false">Lembra-te também: recorrer às pistas afetará a recompensa recebida ao desvendar cada enigma.</string>
+    <string name="tutorial_step_8" translatable="false">&lt;b&gt;Eis a medida da tua recompensa:&lt;/b&gt;&lt;br&gt;Se não utilizares pista alguma, excelente! Receberás a recompensa completa: &lt;b&gt;★★★ 3 estrelas&lt;/b&gt;.&lt;br&gt;&lt;br&gt;Se utilizares apenas uma pista, receberás &lt;b&gt;★★ 2 estrelas&lt;/b&gt;.&lt;br&gt;&lt;br&gt;Mas, se recorreres a duas ou mais pistas... ai de ti! 😄 Restará apenas &lt;b&gt;★ 1 estrela&lt;/b&gt;.</string>
+    <string name="tutorial_closing" translatable="false">Agora, prepara a mente, examina cada detalhe e lembra-te: &lt;b&gt;“Buscai, e achareis.”&lt;/b&gt;&lt;br&gt;Que comece a jornada!</string>
+    <string name="tutorial_final_word" translatable="false">GRAÇA</string>
+</resources>

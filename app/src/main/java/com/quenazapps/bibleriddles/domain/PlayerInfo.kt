@@ -93,7 +93,7 @@ data class PlayerInfo(
         }
 
     companion object {
-        const val TOTAL_STAGES = 50
+        const val TOTAL_STAGES = 51
         const val MAX_STAGE_SCORE = 3
         const val DAILY_TIP_POINTS = 4
     }

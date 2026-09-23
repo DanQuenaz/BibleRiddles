@@ -8,9 +8,9 @@ import org.junit.Test
 class StageAnswersTest {
     @Test
     fun acceptsMainAnswerAndEveryAlternativeAfterNormalizingBothSides() {
-        val answers = StageAnswers("Ezequiel", listOf("Profeta Ezequiel", "Ezekiel"))
+        val answers = StageAnswers("Ezequiel", listOf("Ezekiel"))
         assertTrue(answers.accepts(" EZEQUIEL. "))
-        assertTrue(answers.accepts("profeta   ezequiel!"))
+        assertFalse(answers.accepts("profeta   ezequiel!"))
         assertTrue(answers.accepts("ézékiel"))
         assertFalse(answers.accepts("Davi"))
         assertFalse(answers.accepts("profeta"))
@@ -19,39 +19,45 @@ class StageAnswersTest {
 
     @Test
     fun normalizesConfiguredAlternativesNotOnlyPlayerInput() {
-        val answers = StageAnswers("4", listOf("  QUÁTRO!  ", "Quarto—dia"))
+        val answers = StageAnswers("4", listOf("QUÁTRO!"))
         assertTrue(answers.accepts("4"))
         assertTrue(answers.accepts("quatro"))
-        assertTrue(answers.accepts("QUARTO DIA."))
+        assertFalse(answers.accepts("QUARTO DIA."))
+        assertFalse(answers.accepts("dia4"))
         assertFalse(answers.accepts("3"))
     }
 
     @Test
-    fun acceptsShortRiddleSolutionButNotAnIncompleteAnswer() {
-        val main = "O que é mais doce que o mel? O que é mais forte que o leão?"
-        val answers = StageAnswers(main, listOf("Mel e leão", "Leão e mel"))
-        assertTrue(answers.accepts(main))
-        assertTrue(answers.accepts("MEL E LEAO"))
-        assertTrue(answers.accepts("leão e mel."))
-        assertFalse(answers.accepts("mel"))
+    fun stageTwoAcceptsOnlyHoneyAfterNormalization() {
+        val answers = StageAnswers("MEL")
+        assertTrue(answers.accepts("mel"))
+        assertTrue(answers.accepts("MeL"))
+        assertTrue(answers.accepts("M.E-L!"))
+        assertFalse(answers.accepts("MEL E LEAO"))
+        assertFalse(answers.accepts("O que é mais doce que o mel? O que é mais forte que o leão?"))
         assertFalse(answers.accepts("leão"))
-        assertEquals(main, answers.mainAnswer)
+        assertFalse(answers.accepts("mell"))
+        assertFalse(answers.accepts("me"))
+        assertEquals("MEL", answers.mainAnswer)
     }
 
     @Test
     fun handlesUnicodePunctuationAndWhitespace() {
-        val answers = StageAnswers("Davi", listOf("O rei Davi"))
+        val answers = StageAnswers("Davi")
         assertTrue(answers.accepts("“DÁVI”"))
-        assertTrue(answers.accepts("O\u00a0rei\n\tDavi"))
-        assertTrue(answers.accepts("[O rei Davi]"))
+        assertTrue(answers.accepts("[Da—vi]"))
+        assertFalse(answers.accepts("O\u00a0rei\n\tDavi"))
+        assertFalse(answers.accepts("Da\u00a0vi"))
+        assertFalse(answers.accepts("[O rei Davi]"))
     }
 
     @Test
-    fun blankAlternativesNeverAllowBlankSubmissions() {
-        val answers = StageAnswers("Davi", listOf("", "  ", "..."))
+    fun rejectsBlankPunctuationOnlyAndSymbolSubmissions() {
+        val answers = StageAnswers("Davi")
         for (input in listOf("", " ", "...", "?!", "\n\t", "“”")) {
             assertFalse(answers.accepts(input))
         }
+        assertFalse(answers.accepts("Da\$vi"))
     }
 
     @Test
@@ -64,5 +70,22 @@ class StageAnswersTest {
     @Test(expected = IllegalArgumentException::class)
     fun rejectsMissingMainAnswer() {
         StageAnswers("...", listOf("Davi"))
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun rejectsPhraseAsMainAnswer() {
+        StageAnswers("Rei Davi")
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun rejectsPhraseAsAlternative() {
+        StageAnswers("Davi", listOf("O rei Davi"))
+    }
+
+    @Test
+    fun rejectsTyposRatherThanAcceptingApproximateMatches() {
+        assertFalse(StageAnswers("Ezequiel").accepts("Ezequie"))
+        assertFalse(StageAnswers("4").accepts("44"))
+        assertFalse(StageAnswers("MEL").accepts("x".repeat(100_000)))
     }
 }

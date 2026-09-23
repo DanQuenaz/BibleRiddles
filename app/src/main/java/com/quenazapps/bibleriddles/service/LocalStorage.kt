@@ -1,20 +1,30 @@
 package com.quenazapps.bibleriddles.service
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.quenazapps.bibleriddles.domain.PlayerInfo
 import com.quenazapps.bibleriddles.domain.PlayerInfo.Companion.MAX_STAGE_SCORE
 import com.quenazapps.bibleriddles.domain.PlayerInfo.Companion.TOTAL_STAGES
+import com.quenazapps.bibleriddles.domain.withInsertedFirstStage
 import java.util.Calendar
 
 /** Persists the player's progress in Android SharedPreferences. */
-class LocalStorage(context: Context) {
-    private val preferences = context.applicationContext.getSharedPreferences(
-        PREFERENCES_NAME,
-        Context.MODE_PRIVATE,
+class LocalStorage internal constructor(private val preferences: SharedPreferences) {
+    constructor(context: Context) : this(
+        context.applicationContext.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE),
     )
 
-    fun getPlayerInfo(): PlayerInfo {
+    fun getPlayerInfo(): PlayerInfo = synchronized(PURCHASE_LOCK) {
+        val player = readPlayerInfo()
+        if (preferences.getInt(KEY_STAGE_ORDER_VERSION, 1) < STAGE_ORDER_VERSION) {
+            player.withInsertedFirstStage().also(::savePlayerInfo)
+        } else {
+            player
+        }
+    }
+
+    private fun readPlayerInfo(): PlayerInfo {
         val scores = (1..TOTAL_STAGES).mapNotNull { stageNumber ->
             val score = preferences.getInt(stageScoreKey(stageNumber), 0)
                 .coerceIn(0, MAX_STAGE_SCORE)
@@ -48,6 +58,7 @@ class LocalStorage(context: Context) {
 
     fun savePlayerInfo(playerInfo: PlayerInfo) {
         preferences.edit {
+            putInt(KEY_STAGE_ORDER_VERSION, STAGE_ORDER_VERSION)
             putInt(
                 KEY_LAST_PLAYED_STAGE,
                 playerInfo.lastPlayedStage.coerceIn(0, TOTAL_STAGES),
@@ -95,6 +106,8 @@ class LocalStorage(context: Context) {
     private companion object {
         val PURCHASE_LOCK = Any()
         const val PREFERENCES_NAME = "player_progress"
+        const val KEY_STAGE_ORDER_VERSION = "stage_order_version"
+        const val STAGE_ORDER_VERSION = 2
         const val KEY_LAST_PLAYED_STAGE = "last_played_stage"
         const val KEY_HIGHEST_UNLOCKED_STAGE = "highest_unlocked_stage"
         const val KEY_STAGE_SCORE_PREFIX = "stage_score_"

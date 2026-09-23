@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="stage1_riddle" translatable="false">Meu filho, não se esqueça da minha instrução, mas guarde no coração os meus mandamentos, pois eles prolongarão a sua vida por muitos anos e darão a você prosperidade e paz.</string>
+    <string name="stage1_reference" translatable="false">Provérbios 3:1,2 | NVI</string>
+    <string name="stage1_answer" translatable="false">GRAÇA</string>
+    <string name="stage1_tip_1" translatable="false">Instruções são importantes</string>
+    <string name="stage1_tip_2" translatable="false">Já leu todas as instruções?</string>
+    <string-array name="stage1_accepted_answers" translatable="false" />
+</resources>

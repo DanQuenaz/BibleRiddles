@@ -1,41 +1,30 @@
 package com.quenazapps.bibleriddles.activity.stages
 
 import android.os.Bundle
-import android.os.SystemClock
-import android.view.OrientationEventListener
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.lifecycleScope
 import com.quenazapps.bibleriddles.R
 import com.quenazapps.bibleriddles.activity.stages.ui.theme.BibleRiddlesTheme
 import com.quenazapps.bibleriddles.domain.PlayerInfo
 import com.quenazapps.bibleriddles.service.LocalStorage
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 
 class Stage4Activity : ComponentActivity() {
     private val stageAnswers by lazy {
@@ -46,39 +35,25 @@ class Stage4Activity : ComponentActivity() {
     }
 
     private lateinit var localStorage: LocalStorage
-    private lateinit var orientationListener: OrientationEventListener
     private var playerInfo by mutableStateOf(PlayerInfo())
     private var answer by mutableStateOf("")
     private var feedbackMessage by mutableStateOf<String?>(null)
     private var answerIsCorrect by mutableStateOf(false)
     private var openingNextStage = false
-    private var counter by mutableStateOf(Stage4CounterState())
-    private var counterJob: Job? = null
-    private var lastCounterTick: Long? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         localStorage = LocalStorage(this)
         playerInfo = localStorage.getPlayerInfo()
-        answer = savedInstanceState?.getString(STATE_ANSWER).orEmpty()
+        answer = filterAnswerInput(savedInstanceState?.getString(STATE_ANSWER).orEmpty())
         answerIsCorrect = savedInstanceState?.getBoolean(STATE_CORRECT) ?: false
         feedbackMessage = savedInstanceState?.getString(STATE_FEEDBACK)
-        counter = Stage4CounterState(
-            side = Stage4Side.entries.firstOrNull { it.name == savedInstanceState?.getString(STATE_SIDE) },
-            elapsedMillis = savedInstanceState?.getLong(STATE_ELAPSED) ?: 0L,
-        )
-        orientationListener = object : OrientationEventListener(this) {
-            override fun onOrientationChanged(orientation: Int) {
-                updateCounterTime()
-                counter = counter.withOrientation(orientation)
-            }
-        }
+
         setContent {
             BibleRiddlesTheme(dynamicColor = false) {
                 Stage4Screen(
                     playerInfo = playerInfo,
-                    counterValue = counter.value,
                     answer = answer,
                     feedbackMessage = feedbackMessage,
                     answerIsCorrect = answerIsCorrect,
@@ -91,9 +66,7 @@ class Stage4Activity : ComponentActivity() {
                     onSubmitClick = ::submitAnswer,
                     onNextStageClick = ::openNextStage,
                     onTipClick = {
-                        if (!answerIsCorrect) {
-                            startActivity(StageTipsMenuActivity.createIntent(this, STAGE_NUMBER, STAGE_TIPS))
-                        }
+                        startActivity(StageTipsMenuActivity.createIntent(this, STAGE_NUMBER, STAGE_TIPS))
                     },
                     onBackClick = ::finish,
                 )
@@ -103,41 +76,14 @@ class Stage4Activity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        playerInfo = localStorage.getPlayerInfo()
-        lastCounterTick = SystemClock.elapsedRealtime()
-        if (orientationListener.canDetectOrientation()) orientationListener.enable()
-        counterJob = lifecycleScope.launch {
-            while (isActive) {
-                delay(100L)
-                updateCounterTime()
-            }
-        }
-    }
-
-    override fun onPause() {
-        updateCounterTime()
-        lastCounterTick = null
-        counterJob?.cancel()
-        counterJob = null
-        orientationListener.disable()
-        super.onPause()
+        if (::localStorage.isInitialized) playerInfo = localStorage.getPlayerInfo()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        updateCounterTime()
         outState.putString(STATE_ANSWER, answer)
         outState.putBoolean(STATE_CORRECT, answerIsCorrect)
         outState.putString(STATE_FEEDBACK, feedbackMessage)
-        outState.putString(STATE_SIDE, counter.side?.name)
-        outState.putLong(STATE_ELAPSED, counter.elapsedMillis)
         super.onSaveInstanceState(outState)
-    }
-
-    private fun updateCounterTime() {
-        val lastTick = lastCounterTick ?: return
-        val now = SystemClock.elapsedRealtime()
-        counter = counter.advanceBy(now - lastTick)
-        lastCounterTick = now
     }
 
     private fun submitAnswer() {
@@ -147,6 +93,7 @@ class Stage4Activity : ComponentActivity() {
             feedbackMessage = getString(R.string.incorrect_answer)
             return
         }
+
         val score = (3 - playerInfo.tipsUsedForStage(STAGE_NUMBER)).coerceIn(1, 3)
         playerInfo = playerInfo.withStageScore(STAGE_NUMBER, score)
         localStorage.savePlayerInfo(playerInfo)
@@ -166,11 +113,9 @@ class Stage4Activity : ComponentActivity() {
         const val STATE_ANSWER = "answer"
         const val STATE_CORRECT = "correct"
         const val STATE_FEEDBACK = "feedback"
-        const val STATE_SIDE = "counter_side"
-        const val STATE_ELAPSED = "counter_elapsed"
         val STAGE_TIPS = listOf(
             StageTip.TextTip(id = "tip_1", cost = 1, textRes = R.string.stage4_tip_1),
-            StageTip.TextTip(id = "tip_2", cost = 1, textRes = R.string.stage4_tip_2),
+            StageTip.TextTip(id = "tip_2", cost = 2, textRes = R.string.stage4_tip_2),
         )
     }
 }
@@ -178,7 +123,6 @@ class Stage4Activity : ComponentActivity() {
 @Composable
 private fun Stage4Screen(
     playerInfo: PlayerInfo,
-    counterValue: Int?,
     answer: String,
     feedbackMessage: String?,
     answerIsCorrect: Boolean,
@@ -188,6 +132,7 @@ private fun Stage4Screen(
     onTipClick: () -> Unit,
     onBackClick: () -> Unit,
 ) {
+    val pagerState = rememberPagerState { STAGE4_IMAGES.size }
     StageLayout(
         stageNumber = 4,
         onBackClick = onBackClick,
@@ -195,53 +140,48 @@ private fun Stage4Screen(
         tipsUsedForStage = playerInfo.tipsUsedForStage(4),
         onTipClick = onTipClick,
     ) {
-        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-            val compact = maxHeight < 400.dp
-            val contentHeight = maxHeight.coerceAtLeast(if (compact) 280.dp else 420.dp)
-            // Keep the counter and answer reachable in landscape and with the keyboard open.
-            Box(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-                Column(
-                    modifier = Modifier.fillMaxWidth().height(contentHeight),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    if (playerInfo.scoreForStage(4) > 0 && !answerIsCorrect) {
-                        CompletedStageReview(correctAnswer = stringResource(R.string.stage4_answer)) {
-                            Stage4CounterText(counterValue)
-                        }
-                    } else {
-                        Box(
-                            modifier = Modifier.fillMaxWidth().weight(1f),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Stage4CounterText(counterValue)
-                        }
-                        StageAnswerForm(
-                            answer = answer,
-                            feedbackMessage = feedbackMessage,
-                            answerIsCorrect = answerIsCorrect,
-                            onAnswerChange = onAnswerChange,
-                            onSubmitClick = onSubmitClick,
-                            onNextStageClick = onNextStageClick,
-                            compact = compact,
-                        )
-                    }
-                }
+        if (playerInfo.scoreForStage(4) > 0 && !answerIsCorrect) {
+            CompletedStageReview(correctAnswer = stringResource(R.string.stage4_answer)) {
+                Stage4Riddle(pagerState = pagerState)
             }
+        } else {
+            Box(modifier = Modifier.fillMaxWidth().weight(1f).padding(vertical = 12.dp)) {
+                Stage4Riddle(pagerState = pagerState)
+            }
+            StageAnswerForm(
+                answer = answer,
+                feedbackMessage = feedbackMessage,
+                answerIsCorrect = answerIsCorrect,
+                onAnswerChange = onAnswerChange,
+                onSubmitClick = onSubmitClick,
+                onNextStageClick = onNextStageClick,
+            )
         }
     }
 }
 
+// The missing fourth image is intentional: it is the solution to this riddle.
+internal val STAGE4_IMAGES = listOf(
+    R.mipmap.creation_1,
+    R.mipmap.creation_2,
+    R.mipmap.creation_3,
+    R.mipmap.creation_5,
+    R.mipmap.creation_6,
+    R.mipmap.creation_7,
+)
+
 @Composable
-private fun Stage4CounterText(value: Int?) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        if (value != null) {
-            Text(
-                text = value.toString(),
-                color = Color(0xFF4A2A12),
-                fontFamily = FontFamily.Serif,
-                fontWeight = FontWeight.Bold,
-                fontSize = 56.sp,
-            )
-        }
+internal fun Stage4Riddle(
+    modifier: Modifier = Modifier,
+    pagerState: PagerState = rememberPagerState { STAGE4_IMAGES.size },
+) {
+    // No arrows, page numbers, dots, or instructions; the gesture is part of the puzzle.
+    HorizontalPager(state = pagerState, modifier = modifier.fillMaxSize()) { page ->
+        Image(
+            painter = painterResource(STAGE4_IMAGES[page]),
+            contentDescription = stringResource(R.string.stage4_image_description),
+            contentScale = ContentScale.Fit,
+            modifier = Modifier.fillMaxSize(),
+        )
     }
 }

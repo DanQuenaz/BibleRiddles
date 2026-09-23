@@ -37,6 +37,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -91,12 +92,12 @@ internal fun StageLayout(
 }
 
 @Composable
-internal fun StageTextRiddle(text: String, modifier: Modifier = Modifier) {
+internal fun StageTextRiddle(text: AnnotatedString, modifier: Modifier = Modifier) {
     Text(
         text = text,
         color = Color(0xFF4A2A12),
         fontFamily = FontFamily.Serif,
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.Normal,
         fontSize = 27.sp,
         lineHeight = 36.sp,
         textAlign = TextAlign.Center,
@@ -115,18 +116,16 @@ internal fun StageAnswerForm(
     onAnswerChange: (String) -> Unit,
     onSubmitClick: () -> Unit,
     onNextStageClick: () -> Unit,
-    compact: Boolean = false,
 ) {
     val focusManager = LocalFocusManager.current
 
     OutlinedTextField(
         value = answer,
-        onValueChange = onAnswerChange,
+        onValueChange = { onAnswerChange(filterAnswerInput(it)) },
         placeholder = { Text(stringResource(R.string.answer_placeholder)) },
-        minLines = if (compact) 1 else 3,
-        maxLines = if (compact) 2 else 5,
+        singleLine = true,
         enabled = !answerIsCorrect,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+        keyboardOptions = KeyboardOptions(autoCorrectEnabled = false, imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(
             onDone = {
                 focusManager.clearFocus()
@@ -144,7 +143,7 @@ internal fun StageAnswerForm(
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .height(if (compact) 72.dp else 132.dp),
+            .height(72.dp),
     )
 
     Spacer(modifier = Modifier.height(12.dp))
