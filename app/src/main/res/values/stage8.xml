@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="stage8_image_description" translatable="false">Placa de madeira com uma inscrição em hebraico.</string>
+    <string name="stage8_answer" translatable="false">Deuteronômio</string>
+    <string name="stage8_tip_1" translatable="false">Isso me parece algum idioma bíblico ...</string>
+    <string name="stage8_tip_2" translatable="false">Eu procuraria algum especialista em idiomas.</string>
+</resources>
